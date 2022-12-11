@@ -64,7 +64,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-/// Appends the contents of `clipboard_content` to a file.
+/// Appends the contents of `content` to a file.
 ///
 /// # Examples
 ///
@@ -74,12 +74,17 @@ fn main() -> Result<(), Box<dyn Error>> {
 /// const FILE_PATH = "input.txt";
 /// let mut clipboard = ClipboardContext::new().unwrap();
 ///
-/// match add_item(clipboard, FILE_PATH) {
+/// let content = match clipboard.get_contents() {
+///     Ok(contents) => format!("{}\n", contents),
+///     Err(err) => panic!("Error: unable to get contents from clipboard - {}", err)
+/// };
+///
+/// match add_item(content, FILE_PATH) {
 ///     Ok(_) => {},
 ///     Err(err) => panic!("{}", err)
 /// }
 /// ```
-pub fn append_to_file(clipboard_content: String, file_path: &str) -> Result<(), String> {
+pub fn append_to_file(content: String, file_path: &str) -> Result<(), String> {
     let mut file = match fs::OpenOptions::new()
         .append(true)
         .open(file_path) {
@@ -87,7 +92,7 @@ pub fn append_to_file(clipboard_content: String, file_path: &str) -> Result<(), 
             Err(err) => return Err(format!("Error reading file - {}", err))
         };
 
-    match file.write_all(clipboard_content.as_bytes()) {
+    match file.write_all(content.as_bytes()) {
         Ok(_) => {},
         Err(err) => return Err(format!("Error writing to file - {}", err))
     };
